@@ -18,6 +18,24 @@ import com.dperic.carcare.components.CarCareButton
 import com.dperic.carcare.components.CarCareCard
 import com.dperic.carcare.components.CarCareScreen
 import com.dperic.carcare.viewmodel.CarCareViewModel
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
+import kotlin.math.sqrt
+
 
 @Composable
 fun DashboardScreen(
@@ -28,6 +46,55 @@ fun DashboardScreen(
     val serviceCount = viewModel.serviceRecords.size
     val totalCost = viewModel.getTotalServiceCost()
     val nextReminder = viewModel.reminders.firstOrNull()?.title ?: "Nema podsjetnika"
+
+    val context = LocalContext.current
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+    val shakeOffset = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    var lastShakeTime by remember { mutableStateOf(0L) }
+
+    DisposableEffect(Unit) {
+        val sensorListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+
+                val acceleration = sqrt(x * x + y * y + z * z)
+                val currentTime = System.currentTimeMillis()
+
+                if (acceleration > 18f && currentTime - lastShakeTime > 1000) {
+                    lastShakeTime = currentTime
+
+                    scope.launch {
+                        shakeOffset.animateTo(35f, animationSpec = tween(80))
+                        shakeOffset.animateTo(-35f, animationSpec = tween(80))
+                        shakeOffset.animateTo(20f, animationSpec = tween(80))
+                        shakeOffset.animateTo(0f, animationSpec = tween(80))
+                    }
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+                // Nije potrebno za ovu funkcionalnost
+            }
+        }
+
+        if (accelerometer != null) {
+            sensorManager.registerListener(
+                sensorListener,
+                accelerometer,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
+        }
+
+        onDispose {
+            sensorManager.unregisterListener(sensorListener)
+        }
+    }
+
 
     CarCareScreen {
         Text(
@@ -46,7 +113,10 @@ fun DashboardScreen(
 
         Text(
             text = "🚗",
-            fontSize = 64.sp
+            fontSize = 64.sp,
+            modifier = Modifier.graphicsLayer {
+                translationX = shakeOffset.value
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
