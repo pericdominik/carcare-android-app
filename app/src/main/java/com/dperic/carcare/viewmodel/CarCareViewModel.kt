@@ -121,6 +121,7 @@ class CarCareViewModel : ViewModel() {
             .delete()
     }
 
+
     fun addServiceRecord(
         vehicleId: String,
         type: String,
@@ -146,6 +147,17 @@ class CarCareViewModel : ViewModel() {
             .set(newServiceRecord)
     }
 
+    fun deleteServiceRecord(serviceId: String) {
+        serviceRecords.removeAll { service ->
+            service.id == serviceId
+        }
+
+        db.collection("serviceRecords")
+            .document(serviceId)
+            .delete()
+    }
+
+
     fun addReminder(
         vehicleId: String,
         title: String,
@@ -170,5 +182,15 @@ class CarCareViewModel : ViewModel() {
         return serviceRecords.sumOf { service ->
             service.price.toIntOrNull() ?: 0
         }
+    }
+
+    fun deleteReminder(reminderId: String) {
+        reminders.removeAll { reminder ->
+            reminder.id == reminderId
+        }
+
+        db.collection("reminders")
+            .document(reminderId)
+            .delete()
     }
 }

@@ -99,6 +99,15 @@ fun RemindersScreen(
                     title = reminder.title,
                     value = "Rok: ${reminder.date}\nStatus: $status"
                 )
+
+                CarCareButton(
+                    text = "Obriši podsjetnik",
+                    onClick = {
+                        viewModel.deleteReminder(reminder.id)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 

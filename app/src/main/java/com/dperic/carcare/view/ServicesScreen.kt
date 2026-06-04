@@ -51,6 +51,15 @@ fun ServicesScreen(
                     title = service.type,
                     value = "Datum: ${service.date}\nKilometraža: ${service.mileage} km\nCijena: ${service.price} €\nNapomena: ${service.note}"
                 )
+
+                CarCareButton(
+                    text = "Obriši servis",
+                    onClick = {
+                        viewModel.deleteServiceRecord(service.id)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 
