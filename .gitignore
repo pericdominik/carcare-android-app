@@ -17,3 +17,4 @@ app/build/
 *.apk
 *.aab
 .DS_Store
+app/google-services.json
