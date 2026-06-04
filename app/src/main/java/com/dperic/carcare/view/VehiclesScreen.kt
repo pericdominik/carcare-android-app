@@ -51,6 +51,15 @@ fun VehiclesScreen(
                     title = "${vehicle.brand} ${vehicle.model}",
                     value = "Godina: ${vehicle.year}\nKilometraža: ${vehicle.mileage} km"
                 )
+
+                CarCareButton(
+                    text = "Obriši vozilo",
+                    onClick = {
+                        viewModel.deleteVehicle(vehicle.id)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 

@@ -111,6 +111,16 @@ class CarCareViewModel : ViewModel() {
             .set(newVehicle)
     }
 
+    fun deleteVehicle(vehicleId: String) {
+        vehicles.removeAll { vehicle ->
+            vehicle.id == vehicleId
+        }
+
+        db.collection("vehicles")
+            .document(vehicleId)
+            .delete()
+    }
+
     fun addServiceRecord(
         vehicleId: String,
         type: String,
