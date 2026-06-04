@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.dperic.carcare.model.Reminder
 import com.dperic.carcare.model.ServiceRecord
 import com.dperic.carcare.model.Vehicle
+import com.google.firebase.firestore.FirebaseFirestore
 
 class CarCareViewModel : ViewModel() {
+    private val db = FirebaseFirestore.getInstance()
 
     val vehicles = mutableStateListOf(
         Vehicle(
@@ -55,6 +57,10 @@ class CarCareViewModel : ViewModel() {
         )
 
         vehicles.add(newVehicle)
+
+        db.collection("vehicles")
+            .document(newVehicle.id)
+            .set(newVehicle)
     }
 
     fun addServiceRecord(
@@ -76,6 +82,10 @@ class CarCareViewModel : ViewModel() {
         )
 
         serviceRecords.add(newServiceRecord)
+
+        db.collection("serviceRecords")
+            .document(newServiceRecord.id)
+            .set(newServiceRecord)
     }
 
     fun addReminder(
@@ -92,6 +102,10 @@ class CarCareViewModel : ViewModel() {
         )
 
         reminders.add(newReminder)
+
+        db.collection("reminders")
+            .document(newReminder.id)
+            .set(newReminder)
     }
 
     fun getTotalServiceCost(): Int {
