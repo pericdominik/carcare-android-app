@@ -6,41 +6,89 @@ import com.dperic.carcare.model.Reminder
 import com.dperic.carcare.model.ServiceRecord
 import com.dperic.carcare.model.Vehicle
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class CarCareViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
 
-    val vehicles = mutableStateListOf(
-        Vehicle(
-            id = "1",
-            brand = "Volkswagen",
-            model = "Golf 7",
-            year = "2016",
-            mileage = "175000"
-        )
-    )
+    init {
+        loadVehicles()
+        loadServiceRecords()
+        loadReminders()
+    }
 
-    val serviceRecords = mutableStateListOf(
-        ServiceRecord(
-            id = "1",
-            vehicleId = "1",
-            type = "Zamjena ulja i filtera",
-            date = "20.05.2026.",
-            mileage = "175000",
-            price = "120",
-            note = "Redovni servis"
-        )
-    )
+    val vehicles = mutableStateListOf<Vehicle>()
+    val serviceRecords = mutableStateListOf<ServiceRecord>()
+    val reminders = mutableStateListOf<Reminder>()
 
-    val reminders = mutableStateListOf(
-        Reminder(
-            id = "1",
-            vehicleId = "1",
-            title = "Zamjena ulja",
-            date = "Za 30 dana",
-            isDone = false
-        )
-    )
+    fun loadVehicles() {
+        viewModelScope.launch {
+            try {
+                val snapshot = db.collection("vehicles")
+                    .get()
+                    .await()
+
+                vehicles.clear()
+
+                snapshot.documents.forEach { document ->
+                    val vehicle = document.toObject(Vehicle::class.java)
+
+                    if (vehicle != null) {
+                        vehicles.add(vehicle)
+                    }
+                }
+            } catch (e: Exception) {
+                // Za sada ne prikazujemo grešku u UI-u
+            }
+        }
+    }
+
+    fun loadServiceRecords() {
+        viewModelScope.launch {
+            try {
+                val snapshot = db.collection("serviceRecords")
+                    .get()
+                    .await()
+
+                serviceRecords.clear()
+
+                snapshot.documents.forEach { document ->
+                    val serviceRecord = document.toObject(ServiceRecord::class.java)
+
+                    if (serviceRecord != null) {
+                        serviceRecords.add(serviceRecord)
+                    }
+                }
+            } catch (e: Exception) {
+                // Za sada ne prikazujemo grešku u UI-u
+            }
+        }
+    }
+
+    fun loadReminders() {
+        viewModelScope.launch {
+            try {
+                val snapshot = db.collection("reminders")
+                    .get()
+                    .await()
+
+                reminders.clear()
+
+                snapshot.documents.forEach { document ->
+                    val reminder = document.toObject(Reminder::class.java)
+
+                    if (reminder != null) {
+                        reminders.add(reminder)
+                    }
+                }
+            } catch (e: Exception) {
+                // Za sada ne prikazujemo grešku u UI-u
+            }
+        }
+    }
+
 
     fun addVehicle(
         brand: String,
