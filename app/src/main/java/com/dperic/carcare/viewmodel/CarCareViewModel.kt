@@ -176,13 +176,15 @@ class CarCareViewModel : ViewModel() {
     fun addReminder(
         vehicleId: String,
         title: String,
-        date: String
+        date: String,
+        time: String
     ) {
         val newReminder = Reminder(
             id = System.currentTimeMillis().toString(),
             vehicleId = vehicleId,
             title = title,
             date = date,
+            time = time,
             isDone = false
         )
 

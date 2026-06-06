@@ -19,6 +19,8 @@ import com.dperic.carcare.components.CarCareCard
 import com.dperic.carcare.components.CarCareInputField
 import com.dperic.carcare.components.CarCareScreen
 import com.dperic.carcare.viewmodel.CarCareViewModel
+import androidx.compose.ui.platform.LocalContext
+import com.dperic.carcare.notification.ReminderNotificationScheduler
 
 @Composable
 fun RemindersScreen(
@@ -27,9 +29,11 @@ fun RemindersScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
     val selectedVehicleId = viewModel.vehicles.firstOrNull()?.id ?: ""
+    val context = LocalContext.current
 
     CarCareScreen {
         Text(
@@ -54,22 +58,32 @@ fun RemindersScreen(
             onValueChange = { date = it }
         )
 
+        CarCareInputField(
+            value = time,
+            label = "Vrijeme obavijesti, npr. 14:30",
+            onValueChange = { time = it }
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         CarCareButton(
             text = "Dodaj podsjetnik",
             onClick = {
-                if (title.isBlank() || date.isBlank()) {
-                    errorMessage = "Naziv i datum podsjetnika moraju biti popunjeni."
+                if (title.isBlank() || date.isBlank() || time.isBlank()) {
+                    errorMessage = "Naziv, datum i vrijeme podsjetnika moraju biti popunjeni."
                 } else {
-                    viewModel.addReminder(
-                        vehicleId = selectedVehicleId,
+                    viewModel.addReminder(selectedVehicleId, title, date, time)
+
+                    ReminderNotificationScheduler.scheduleReminder(
+                        context = context,
                         title = title,
-                        date = date
+                        date = date,
+                        time = time
                     )
 
                     title = ""
                     date = ""
+                    time = ""
                     errorMessage = ""
                 }
             }
@@ -97,7 +111,7 @@ fun RemindersScreen(
 
                 CarCareCard(
                     title = reminder.title,
-                    value = "Rok: ${reminder.date}\nStatus: $status"
+                    value = "Rok: ${reminder.date}\nVrijeme: ${reminder.time}\nStatus: $status"
                 )
 
                 CarCareButton(

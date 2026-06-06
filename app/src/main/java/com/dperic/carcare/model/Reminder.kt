@@ -5,5 +5,6 @@ data class Reminder(
     val vehicleId: String = "",
     val title: String = "",
     val date: String = "",
+    val time: String = "",
     val isDone: Boolean = false
 )
