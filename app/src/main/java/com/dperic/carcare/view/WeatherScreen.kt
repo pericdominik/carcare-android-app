@@ -2,6 +2,7 @@ package com.dperic.carcare.view
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,14 +19,14 @@ import com.dperic.carcare.components.CarCareButton
 import com.dperic.carcare.components.CarCareCard
 import com.dperic.carcare.components.CarCareInputField
 import com.dperic.carcare.components.CarCareScreen
+import com.dperic.carcare.viewmodel.CarCareViewModel
 
 @Composable
 fun WeatherScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: CarCareViewModel
 ) {
     var city by remember { mutableStateOf("") }
-    var weatherResult by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
 
     CarCareScreen {
         Text(
@@ -49,34 +50,37 @@ fun WeatherScreen(
         CarCareButton(
             text = "Provjeri vrijeme",
             onClick = {
-                if (city.isBlank()) {
-                    errorMessage = "Unesite naziv grada."
-                    weatherResult = ""
-                } else {
-                    errorMessage = ""
-                    weatherResult =
-                        "Grad: $city\nTemperatura: 22°C\nVrijeme: Sunčano\nUvjeti za vožnju: Dobri"
-                }
+                viewModel.fetchWeather(city)
             }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (errorMessage.isNotBlank()) {
+        if (viewModel.isWeatherLoading) {
+            CircularProgressIndicator()
+        }
+
+        if (viewModel.weatherError.isNotBlank()) {
             CarCareCard(
                 title = "Greška",
-                value = errorMessage
+                value = viewModel.weatherError
             )
         }
 
-        if (weatherResult.isNotBlank()) {
+        if (viewModel.weatherResult.isNotBlank()) {
             CarCareCard(
                 title = "Rezultat",
-                value = weatherResult
+                value = viewModel.weatherResult
             )
-        } else {
+        }
+
+        if (
+            !viewModel.isWeatherLoading &&
+            viewModel.weatherError.isBlank() &&
+            viewModel.weatherResult.isBlank()
+        ) {
             CarCareCard(
-                title = "Primjer prikaza",
+                title = "Uputa",
                 value = "Unesite grad kako biste provjerili vremenske uvjete za vožnju."
             )
         }

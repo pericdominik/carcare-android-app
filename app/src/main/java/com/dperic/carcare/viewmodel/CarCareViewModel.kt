@@ -9,9 +9,24 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.dperic.carcare.BuildConfig
+import com.dperic.carcare.network.RetrofitInstance
 
 class CarCareViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
+
+    var weatherResult by mutableStateOf("")
+        private set
+
+    var weatherError by mutableStateOf("")
+        private set
+
+    var isWeatherLoading by mutableStateOf(false)
+        private set
+
 
     init {
         loadVehicles()
@@ -192,5 +207,60 @@ class CarCareViewModel : ViewModel() {
         db.collection("reminders")
             .document(reminderId)
             .delete()
+    }
+
+
+    fun fetchWeather(city: String) {
+        if (city.isBlank()) {
+            weatherError = "Unesite naziv grada."
+            weatherResult = ""
+            return
+        }
+
+        if (BuildConfig.OPENWEATHER_API_KEY.isBlank()) {
+            weatherError = "API ključ nije pronađen."
+            weatherResult = ""
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                isWeatherLoading = true
+                weatherError = ""
+                weatherResult = ""
+
+                val response = RetrofitInstance.api.getWeatherByCity(
+                    city = city,
+                    apiKey = BuildConfig.OPENWEATHER_API_KEY
+                )
+
+                val description = response.weather.firstOrNull()?.description ?: "Nema opisa"
+
+                weatherResult =
+                    "Grad: ${response.name}\n" +
+                            "Temperatura: ${response.main.temp} °C\n" +
+                            "Vlažnost: ${response.main.humidity}%\n" +
+                            "Vrijeme: $description\n" +
+                            "Uvjeti za vožnju: ${getDrivingCondition(response.main.temp, description)}"
+
+            } catch (e: Exception) {
+                weatherError = "Nije moguće dohvatiti vremenske podatke."
+            } finally {
+                isWeatherLoading = false
+            }
+        }
+    }
+
+    private fun getDrivingCondition(
+        temperature: Double,
+        description: String
+    ): String {
+        return when {
+            description.contains("kiša", ignoreCase = true) -> "Oprez, cesta može biti mokra"
+            description.contains("snijeg", ignoreCase = true) -> "Oprez, mogući su teški uvjeti"
+            description.contains("magla", ignoreCase = true) -> "Oprez, smanjena vidljivost"
+            temperature < 0 -> "Oprez, moguća poledica"
+            else -> "Dobri"
+        }
     }
 }

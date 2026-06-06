@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,15 @@ plugins {
 
     id("com.google.gms.google-services")
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val openWeatherApiKey = localProperties.getProperty("OPENWEATHER_API_KEY") ?: ""
 
 android {
     namespace = "com.dperic.carcare"
@@ -19,7 +30,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val openWeatherApiKey = project.findProperty("OPENWEATHER_API_KEY") as String? ?: ""
 
         buildConfigField(
             "String",

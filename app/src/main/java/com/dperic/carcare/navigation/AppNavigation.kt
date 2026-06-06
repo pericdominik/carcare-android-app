@@ -53,7 +53,7 @@ fun AppNavigation() {
         }
 
         composable("weather") {
-            WeatherScreen(navController)
+            WeatherScreen(navController, viewModel)
         }
     }
 }
