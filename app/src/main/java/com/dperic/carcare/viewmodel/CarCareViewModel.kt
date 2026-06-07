@@ -228,6 +228,19 @@ class CarCareViewModel : ViewModel() {
     }
 
 
+    fun getVehicleName(vehicleId: String): String {
+        val vehicle = vehicles.find { vehicle ->
+            vehicle.id == vehicleId
+        }
+
+        return if (vehicle != null) {
+            "${vehicle.brand} ${vehicle.model}"
+        } else {
+            "Nepoznato vozilo"
+        }
+    }
+
+
     fun fetchWeather(city: String) {
         if (city.isBlank()) {
             weatherError = "Unesite naziv grada."

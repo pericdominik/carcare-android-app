@@ -32,7 +32,9 @@ fun AddServiceScreen(
     var note by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    val selectedVehicleId = viewModel.vehicles.firstOrNull()?.id ?: ""
+    var selectedVehicleId by remember {
+        mutableStateOf(viewModel.vehicles.firstOrNull()?.id ?: "")
+    }
 
     CarCareScreen {
         Text(
@@ -42,6 +44,36 @@ fun AddServiceScreen(
         )
 
         Text(text = "Unesite podatke o servisnom zapisu")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Odaberite vozilo",
+            fontWeight = FontWeight.Bold
+        )
+
+        if (viewModel.vehicles.isEmpty()) {
+            CarCareCard(
+                title = "Nema vozila",
+                value = "Prvo dodajte vozilo kako biste mogli dodati servis."
+            )
+        } else {
+            viewModel.vehicles.forEach { vehicle ->
+                val vehicleName = "${vehicle.brand} ${vehicle.model}"
+                val buttonText = if (vehicle.id == selectedVehicleId) {
+                    "x $vehicleName"
+                } else {
+                    vehicleName
+                }
+
+                CarCareButton(
+                    text = buttonText,
+                    onClick = {
+                        selectedVehicleId = vehicle.id
+                    }
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -80,12 +112,9 @@ fun AddServiceScreen(
         CarCareButton(
             text = "Spremi servis",
             onClick = {
-                if (
-                    type.isBlank() ||
-                    date.isBlank() ||
-                    mileage.isBlank() ||
-                    price.isBlank()
-                ) {
+                if (selectedVehicleId.isBlank()) {
+                    errorMessage = "Prvo morate odabrati vozilo."
+                } else if (type.isBlank() || date.isBlank() || mileage.isBlank() || price.isBlank()) {
                     errorMessage = "Tip servisa, datum, kilometraža i cijena moraju biti popunjeni."
                 } else {
                     viewModel.addServiceRecord(

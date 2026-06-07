@@ -49,7 +49,7 @@ fun ServicesScreen(
             viewModel.serviceRecords.forEach { service ->
                 CarCareCard(
                     title = service.type,
-                    value = "Datum: ${service.date}\nKilometraža: ${service.mileage} km\nCijena: ${service.price} €\nNapomena: ${service.note}"
+                    value = "Vozilo: ${viewModel.getVehicleName(service.vehicleId)}\nDatum: ${service.date}\nKilometraža: ${service.mileage} km\nCijena: ${service.price} €\nNapomena: ${service.note}"
                 )
 
                 CarCareButton(

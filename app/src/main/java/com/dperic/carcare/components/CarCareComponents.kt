@@ -12,9 +12,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+val CarCareBlue = Color(0xFF4564A0)
+val CarCareBackground = Color(0xFFF4F6FA)
+val CarCareCardColor = Color(0xFFFFFFFF)
+val CarCareTextDark = Color(0xFF1E1E1E)
+
 @Composable
 fun CarCareScreen(
     content: @Composable ColumnScope.() -> Unit
@@ -32,9 +39,9 @@ fun CarCareScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(CarCareBackground)
             .verticalScroll(rememberScrollState())
-            .padding(20.dp),
+            .padding(horizontal = 24.dp, vertical = 22.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         content = content
     )
@@ -48,23 +55,30 @@ fun CarCareCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(vertical = 7.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE0E0E0)
+            containerColor = CarCareCardColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
         )
     ) {
         Column(
-            modifier = Modifier.padding(14.dp)
+            modifier = Modifier.padding(18.dp)
         ) {
             Text(
                 text = title,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = CarCareTextDark
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Text(text = value)
+            Text(
+                text = value,
+                color = CarCareTextDark
+            )
         }
     }
 }
@@ -78,9 +92,17 @@ fun CarCareButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 5.dp)
+            .height(48.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = CarCareBlue,
+            contentColor = Color.White
+        )
     ) {
-        Text(text = text)
+        Text(text = text,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 
@@ -96,8 +118,14 @@ fun CarCareInputField(
         label = { Text(label) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        singleLine = true
+            .padding(vertical = 6.dp),
+        singleLine = true,
+        shape = RoundedCornerShape(14.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = CarCareBlue,
+            focusedLabelColor = CarCareBlue,
+            cursorColor = CarCareBlue
+        )
     )
 }
 
@@ -116,7 +144,11 @@ fun BackToDashboardButton(
             }
         }
     ) {
-        Text("Natrag")
+        Text(
+            text = "Natrag na početnu",
+            color = CarCareBlue,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

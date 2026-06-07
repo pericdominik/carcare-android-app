@@ -32,7 +32,10 @@ fun RemindersScreen(
     var time by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    val selectedVehicleId = viewModel.vehicles.firstOrNull()?.id ?: ""
+    var selectedVehicleId by remember {
+        mutableStateOf(viewModel.vehicles.firstOrNull()?.id ?: "")
+    }
+
     val context = LocalContext.current
 
     CarCareScreen {
@@ -46,6 +49,36 @@ fun RemindersScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Text(
+            text = "Odaberite vozilo",
+            fontWeight = FontWeight.Bold
+        )
+
+        if (viewModel.vehicles.isEmpty()) {
+            CarCareCard(
+                title = "Nema vozila",
+                value = "Prvo dodajte vozilo kako biste mogli dodati podsjetnik."
+            )
+        } else {
+            viewModel.vehicles.forEach { vehicle ->
+                val vehicleName = "${vehicle.brand} ${vehicle.model}"
+                val buttonText = if (vehicle.id == selectedVehicleId) {
+                    "x $vehicleName"
+                } else {
+                    vehicleName
+                }
+
+                CarCareButton(
+                    text = buttonText,
+                    onClick = {
+                        selectedVehicleId = vehicle.id
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         CarCareInputField(
             value = title,
             label = "Naziv podsjetnika",
@@ -54,13 +87,13 @@ fun RemindersScreen(
 
         CarCareInputField(
             value = date,
-            label = "Datum ili opis roka",
+            label = "Datum, npr. 07.07.2026.",
             onValueChange = { date = it }
         )
 
         CarCareInputField(
             value = time,
-            label = "Vrijeme obavijesti, npr. 14:30",
+            label = "Vrijeme, npr. 14:30",
             onValueChange = { time = it }
         )
 
@@ -69,7 +102,9 @@ fun RemindersScreen(
         CarCareButton(
             text = "Dodaj podsjetnik",
             onClick = {
-                if (title.isBlank() || date.isBlank() || time.isBlank()) {
+                if (selectedVehicleId.isBlank()) {
+                    errorMessage = "Prvo morate odabrati vozilo."
+                } else if (title.isBlank() || date.isBlank() || time.isBlank()) {
                     errorMessage = "Naziv, datum i vrijeme podsjetnika moraju biti popunjeni."
                 } else {
                     viewModel.addReminder(selectedVehicleId, title, date, time)
@@ -111,7 +146,7 @@ fun RemindersScreen(
 
                 CarCareCard(
                     title = reminder.title,
-                    value = "Rok: ${reminder.date}\nVrijeme: ${reminder.time}\nStatus: $status"
+                    value = "Vozilo: ${viewModel.getVehicleName(reminder.vehicleId)}\nRok: ${reminder.date}\nVrijeme: ${reminder.time}\nStatus: $status"
                 )
 
                 if (!reminder.isDone) {
