@@ -165,7 +165,7 @@ fun DashboardScreen(
                 onClick = { navController.navigate("service_map") },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Mapa")
+                Text("Lokacije servisa")
             }
 
             Spacer(modifier = Modifier.width(8.dp))
