@@ -114,6 +114,15 @@ fun RemindersScreen(
                     value = "Rok: ${reminder.date}\nVrijeme: ${reminder.time}\nStatus: $status"
                 )
 
+                if (!reminder.isDone) {
+                    CarCareButton(
+                        text = "Označi kao završeno",
+                        onClick = {
+                            viewModel.completeReminder(reminder.id)
+                        }
+                    )
+                }
+
                 CarCareButton(
                     text = "Obriši podsjetnik",
                     onClick = {

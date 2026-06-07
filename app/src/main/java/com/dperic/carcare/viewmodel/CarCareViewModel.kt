@@ -211,6 +211,22 @@ class CarCareViewModel : ViewModel() {
             .delete()
     }
 
+    fun completeReminder(reminderId: String) {
+        val reminderIndex = reminders.indexOfFirst { reminder ->
+            reminder.id == reminderId
+        }
+
+        if (reminderIndex != -1) {
+            val updatedReminder = reminders[reminderIndex].copy(isDone = true)
+
+            reminders[reminderIndex] = updatedReminder
+
+            db.collection("reminders")
+                .document(reminderId)
+                .set(updatedReminder)
+        }
+    }
+
 
     fun fetchWeather(city: String) {
         if (city.isBlank()) {
