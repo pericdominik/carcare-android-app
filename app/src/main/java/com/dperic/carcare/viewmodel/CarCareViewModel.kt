@@ -187,7 +187,7 @@ class CarCareViewModel : ViewModel() {
             title = title,
             date = date,
             time = time,
-            isDone = false
+            completed = false
         )
 
         reminders.add(newReminder)
@@ -219,7 +219,7 @@ class CarCareViewModel : ViewModel() {
         }
 
         if (reminderIndex != -1) {
-            val updatedReminder = reminders[reminderIndex].copy(isDone = true)
+            val updatedReminder = reminders[reminderIndex].copy(completed = true)
 
             reminders[reminderIndex] = updatedReminder
 
@@ -235,7 +235,7 @@ class CarCareViewModel : ViewModel() {
 
         val nextReminder = reminders
             .filter { reminder ->
-                !reminder.isDone && reminder.date.isNotBlank() && reminder.time.isNotBlank()
+                !reminder.completed && reminder.date.isNotBlank() && reminder.time.isNotBlank()
             }
             .mapNotNull { reminder ->
                 try {

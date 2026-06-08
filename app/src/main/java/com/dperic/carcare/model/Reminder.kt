@@ -6,5 +6,5 @@ data class Reminder(
     val title: String = "",
     val date: String = "",
     val time: String = "",
-    val isDone: Boolean = false
+    val completed: Boolean = false
 )

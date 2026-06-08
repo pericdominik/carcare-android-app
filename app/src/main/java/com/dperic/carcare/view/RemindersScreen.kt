@@ -142,14 +142,14 @@ fun RemindersScreen(
             )
         } else {
             viewModel.reminders.forEach { reminder ->
-                val status = if (reminder.isDone) "Završeno" else "Aktivno"
+                val status = if (reminder.completed) "Završeno" else "Aktivno"
 
                 CarCareCard(
                     title = reminder.title,
                     value = "Vozilo: ${viewModel.getVehicleName(reminder.vehicleId)}\nRok: ${reminder.date}\nVrijeme: ${reminder.time}\nStatus: $status"
                 )
 
-                if (!reminder.isDone) {
+                if (!reminder.completed) {
                     CarCareButton(
                         text = "Označi kao završeno",
                         onClick = {
