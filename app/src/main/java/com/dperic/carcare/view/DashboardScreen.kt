@@ -45,7 +45,7 @@ fun DashboardScreen(
     val vehicleCount = viewModel.vehicles.size
     val serviceCount = viewModel.serviceRecords.size
     val totalCost = viewModel.getTotalServiceCost()
-    val nextReminder = viewModel.reminders.firstOrNull()?.title ?: "Nema podsjetnika"
+    val nextReminder = viewModel.getNextActiveReminderText()
 
     val context = LocalContext.current
     val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager

@@ -14,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.dperic.carcare.BuildConfig
 import com.dperic.carcare.network.RetrofitInstance
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class CarCareViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
@@ -224,6 +226,38 @@ class CarCareViewModel : ViewModel() {
             db.collection("reminders")
                 .document(reminderId)
                 .set(updatedReminder)
+        }
+    }
+
+    fun getNextActiveReminderText(): String {
+        val format = SimpleDateFormat("dd.MM.yyyy. HH:mm", Locale.getDefault())
+        val currentTime = System.currentTimeMillis()
+
+        val nextReminder = reminders
+            .filter { reminder ->
+                !reminder.isDone && reminder.date.isNotBlank() && reminder.time.isNotBlank()
+            }
+            .mapNotNull { reminder ->
+                try {
+                    val reminderDateTime = format.parse("${reminder.date} ${reminder.time}")
+                    if (reminderDateTime != null && reminderDateTime.time >= currentTime) {
+                        reminder to reminderDateTime.time
+                    } else {
+                        null
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            .minByOrNull { pair ->
+                pair.second
+            }
+            ?.first
+
+        return if (nextReminder != null) {
+            "${nextReminder.title} - ${nextReminder.date} u ${nextReminder.time}"
+        } else {
+            "Nema aktivnih podsjetnika"
         }
     }
 
